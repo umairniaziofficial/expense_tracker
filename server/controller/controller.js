@@ -91,7 +91,13 @@ async function getTransactions(req, res) {
 // Delete a specific transaction by ID
 async function deleteTransaction(req, res) {
   try {
-    const transactionId = req.params.id;
+    if (!req.body) {
+      return res.status(400).json({ message: "Request body not found" });
+    }
+
+    const transactionId = req.body.id; 
+    console.log(transactionId);
+
     const deletedTransaction = await Transaction.findByIdAndDelete(transactionId);
 
     if (!deletedTransaction) {
@@ -104,7 +110,6 @@ async function deleteTransaction(req, res) {
     res.status(500).json({ error: "Failed to delete transaction" });
   }
 }
-
 async function getLabels(req, res) {
   try {
     const result = await Transaction.aggregate([
@@ -117,9 +122,16 @@ async function getLabels(req, res) {
         }
       },
       {
-        $unwind: "$category_info"
+        $unwind: {
+          path: "$category_info",
+          preserveNullAndEmptyArrays: true 
+        }
       }
     ]);
+
+    if (!result) {
+      return res.status(404).json({ error: "No transactions found" });
+    }
 
     res.json(result);
   } catch (error) {
