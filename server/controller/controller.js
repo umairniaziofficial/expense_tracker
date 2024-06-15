@@ -96,7 +96,6 @@ async function deleteTransaction(req, res) {
     }
 
     const transactionId = req.body.id; 
-    console.log(transactionId);
 
     const deletedTransaction = await Transaction.findByIdAndDelete(transactionId);
 
