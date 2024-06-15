@@ -1,4 +1,5 @@
 import { default as api } from "../store/apiSlice";
+import { getLabels } from "../helper/helper"; 
 
 export default function Labels() {
   const { data, isFetching, isSuccess, isError } = api.useGetLabelsQuery();
@@ -11,16 +12,17 @@ export default function Labels() {
     return <p className="text-center text-red-500">An error occurred.</p>;
   }
 
-  // If data fetching was successful and data exists
+  
   if (isSuccess && data && data.length > 0) {
+    const labeledData = getLabels(data); 
     return (
       <div className="w-full">
-        {data.map((item, index) => (
+        {labeledData.map((item, index) => (
           <LabelComponent
             key={index} 
-            color={item.category_info.color || "#000"} 
-            type={item.category_info.type}
-            percentage={item.percent}
+            color={item.color || "#000"} 
+            type={item.type}
+            percentage={item.percent.toFixed(2) + '%'} 
           />
         ))}
       </div>
@@ -29,6 +31,7 @@ export default function Labels() {
 
   return <p className="text-center text-gray-500">No data available</p>;
 }
+
 
 // eslint-disable-next-line react/prop-types
 function LabelComponent({ color, type, percentage }) {
@@ -39,7 +42,7 @@ function LabelComponent({ color, type, percentage }) {
         <h3>{type}</h3>
       </div>
       <div>
-        <h3 className="font-bold">{percentage? percentage : '0%'}</h3>
+        <h3 className="font-bold">{parseFloat(percentage).toFixed(0)}%</h3>
       </div>
     </div>
   );
